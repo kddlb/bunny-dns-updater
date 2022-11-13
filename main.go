@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/go-playground/validator/v10"
-	"github.com/samber/lo"
-	"github.com/spf13/viper"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/samber/lo"
+	"github.com/spf13/viper"
 )
 
 func main() {
@@ -76,19 +77,19 @@ func main() {
 		panic(fmt.Errorf("error while parsing DNS zones: %v", err))
 	}
 
-	zone, ok := lo.Find[BunnyDNSZone](bunnyDNSZones.Items, func(z BunnyDNSZone) bool {
+	zone, ok := lo.Find(bunnyDNSZones.Items, func(z BunnyDNSZone) bool {
 		return z.Domain == C.Zone
 	})
 
-	if ok == false {
+	if !ok {
 		panic(fmt.Errorf("could not find zone named %s", C.Zone))
 	}
 
-	record, ok := lo.Find[Record](zone.Records, func(r Record) bool {
+	record, ok := lo.Find(zone.Records, func(r Record) bool {
 		return r.Name == C.Record
 	})
 
-	if ok == false {
+	if !ok {
 		panic(fmt.Errorf("could not find record named %s in zone %s", C.Zone, C.Record))
 	}
 
@@ -142,7 +143,7 @@ func main() {
 		}
 		updateRequest.Header.Set("AccessKey", C.AccessKey)
 
-		updateResponse, err := httpClient.Do(zonesRequest)
+		updateResponse, err := httpClient.Do(updateRequest)
 
 		if err != nil {
 			panic(fmt.Errorf("error while updating DNS record: %v", err))
